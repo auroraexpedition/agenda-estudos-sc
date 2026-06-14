@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Minha Agenda de Estudos">
+<meta name="theme-color" content="#7e22ce">
+<title>Minha Agenda de Provas ✨</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
+  :root { --bg:#faf5ff; --card:#ffffff; --text:#1e1b4b; --radius:20px; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 10% 20%,rgba(192,132,252,.12) 0%,transparent 50%),radial-gradient(circle at 90% 80%,rgba(244,114,182,.10) 0%,transparent 50%);color:var(--text);min-height:100vh;padding:0 0 80px;-webkit-tap-highlight-color:transparent;}
+
+  .hero{background:linear-gradient(135deg,#7e22ce 0%,#c084fc 50%,#f472b6 100%);padding:28px 20px 44px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");}
+  .hero-emoji{font-size:3.5rem;display:block;margin-bottom:10px;animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .hero h1{font-family:'Fredoka One',sans-serif;font-size:clamp(1.6rem,6vw,2.4rem);color:white;text-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .hero p{color:rgba(255,255,255,.85);font-size:1rem;font-weight:600;margin-top:6px;}
+  .hstar{position:absolute;animation:twinkle 2s ease-in-out infinite;opacity:.7;}
+  @keyframes twinkle{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.2);}}
+
+  .prog-wrap{max-width:1060px;margin:0 auto;padding:0 12px;}
+  .progress-section{background:white;margin-top:-24px;border-radius:var(--radius);padding:16px 18px;box-shadow:0 8px 32px rgba(126,34,206,.12);position:relative;z-index:10;}
+  .prog-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .prog-lbl{font-weight:800;font-size:.9rem;color:#7e22ce;}
+  .prog-cnt{font-family:'Fredoka One',sans-serif;font-size:1.1rem;color:#c084fc;}
+  .prog-bg{background:#f3e8ff;border-radius:50px;height:18px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,#c084fc,#f472b6);border-radius:50px;transition:width .5s cubic-bezier(.4,2,.6,1);min-width:0;}
+  .prog-msg{text-align:center;margin-top:10px;font-size:.85rem;font-weight:700;color:#9333ea;min-height:22px;}
+
+  .container{max-width:1060px;margin:20px auto 0;padding:0 12px;}
+  .week-lbl{font-family:'Fredoka One',sans-serif;font-size:1.1rem;color:#7e22ce;margin:28px 0 14px;display:flex;align-items:center;gap:8px;}
+  .week-lbl::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,#ede9fe,transparent);border-radius:2px;}
+  .days-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:600px){.days-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}}
+
+  .day-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 4px 16px rgba(126,34,206,.08);transition:transform .2s,box-shadow .2s;position:relative;-webkit-touch-callout:none;}
+  .day-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(126,34,206,.15);}
+  .day-card.completed{box-shadow:0 4px 20px rgba(52,211,153,.3);}
+  .day-card.completed .complete-badge{display:flex;}
+  .complete-badge{display:none;position:absolute;top:10px;right:10px;z-index:5;background:linear-gradient(135deg,#34d399,#059669);color:white;font-size:.68rem;font-weight:900;padding:4px 10px;border-radius:20px;align-items:center;gap:4px;}
+  .mat-banner{background:linear-gradient(90deg,#fb923c,#f97316);color:white;font-size:.72rem;font-weight:900;text-align:center;padding:5px;letter-spacing:.05em;text-transform:uppercase;}
+  .day-card.mat-special{border:2.5px solid #fb923c;}
+
+  .day-hdr{padding:16px 18px 14px;}
+  .day-wday{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:2px;}
+  .day-title{font-family:'Fredoka One',sans-serif;font-size:1.2rem;line-height:1.25;}
+  .date-badge{display:inline-block;background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.5);font-size:.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-top:6px;}
+  .prova-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.9);color:#dc2626;font-size:.68rem;font-weight:900;padding:3px 10px;border-radius:20px;margin-top:6px;border:1.5px solid rgba(220,38,38,.3);}
+  .ac-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.9);color:#d97706;font-size:.68rem;font-weight:900;padding:3px 10px;border-radius:20px;margin-top:6px;margin-left:6px;border:1.5px solid rgba(217,119,6,.3);}
+
+  .day-body{padding:12px 14px 16px;}
+  .sec-lbl{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .sec-lbl::before{content:'';width:3px;height:12px;border-radius:2px;background:currentColor;}
+  .escola-pill{display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;color:#64748b;font-size:.78rem;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:12px;}
+
+  .tg{margin-bottom:10px;}
+  .tg-name{font-weight:800;font-size:.8rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;}
+  .task{display:flex;align-items:flex-start;gap:10px;padding:10px 10px;border-radius:10px;margin-bottom:4px;cursor:pointer;transition:background .15s;user-select:none;-webkit-user-select:none;}
+  .task:hover{background:#faf5ff;}
+  .task.done{opacity:.55;}
+  .task.done .task-txt{text-decoration:line-through;color:#9ca3af;}
+  .task.done .cb{color:white;transform:scale(1.1);}
+  .cb{width:26px;height:26px;min-width:26px;border-radius:8px;border:2.5px solid;display:flex;align-items:center;justify-content:center;transition:all .2s cubic-bezier(.4,2,.6,1);font-size:.85rem;margin-top:1px;background:white;}
+  .task-txt{font-size:.88rem;font-weight:600;color:#374151;line-height:1.5;flex:1;}
+
+  .tip{background:#fef9c3;border-left:3px solid #fbbf24;border-radius:0 10px 10px 0;padding:8px 12px;margin-top:10px;font-size:.78rem;font-weight:600;color:#78350f;line-height:1.5;}
+  .atip{background:#fff7ed;border-left:3px solid #fb923c;border-radius:0 10px 10px 0;padding:8px 12px;margin-top:10px;font-size:.78rem;font-weight:600;color:#9a3412;line-height:1.5;}
+  .divider{height:1px;background:#f3f4f6;margin:12px 0;}
+  .prova-block{border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:.85rem;}
+
+  .th-port .tg-name{background:#ede9fe;color:#7e22ce;} .th-port{background:#f3e8ff;} .th-port .cb{border-color:#c084fc;} .th-port .task.done .cb{background:#c084fc;border-color:#c084fc;}
+  .th-livro .tg-name{background:#f3e8ff;color:#9333ea;} .th-livro{background:#fdf4ff;} .th-livro .cb{border-color:#d946ef;} .th-livro .task.done .cb{background:#d946ef;border-color:#d946ef;}
+  .th-geo .tg-name{background:#d1fae5;color:#065f46;} .th-geo{background:#ecfdf5;} .th-geo .cb{border-color:#34d399;} .th-geo .task.done .cb{background:#34d399;border-color:#34d399;}
+  .th-ing .tg-name{background:#dbeafe;color:#1e40af;} .th-ing{background:#eff6ff;} .th-ing .cb{border-color:#60a5fa;} .th-ing .task.done .cb{background:#60a5fa;border-color:#60a5fa;}
+  .th-cien .tg-name{background:#ffe4e6;color:#9f1239;} .th-cien{background:#fff1f2;} .th-cien .cb{border-color:#fb7185;} .th-cien .task.done .cb{background:#fb7185;border-color:#fb7185;}
+  .th-fil .tg-name{background:#fef3c7;color:#92400e;} .th-fil{background:#fffbeb;} .th-fil .cb{border-color:#fbbf24;} .th-fil .task.done .cb{background:#fbbf24;border-color:#fbbf24;}
+  .th-mat .tg-name{background:#ffedd5;color:#9a3412;} .th-mat{background:#fff7ed;} .th-mat .cb{border-color:#fb923c;} .th-mat .task.done .cb{background:#fb923c;border-color:#fb923c;}
+  .th-hist .tg-name{background:#e0f2fe;color:#0c4a6e;} .th-hist{background:#f0f9ff;} .th-hist .cb{border-color:#38bdf8;} .th-hist .task.done .cb{background:#38bdf8;border-color:#38bdf8;}
+  .th-ling .tg-name{background:#dcfce7;color:#14532d;} .th-ling{background:#f0fdf4;} .th-ling .cb{border-color:#4ade80;} .th-ling .task.done .cb{background:#4ade80;border-color:#4ade80;}
+
+  .hdr-port{background:linear-gradient(135deg,#7e22ce,#c084fc);color:white;}
+  .hdr-livro{background:linear-gradient(135deg,#9333ea,#e879f9);color:white;}
+  .hdr-geo{background:linear-gradient(135deg,#059669,#34d399);color:white;}
+  .hdr-ing{background:linear-gradient(135deg,#1e40af,#60a5fa);color:white;}
+  .hdr-cien{background:linear-gradient(135deg,#be123c,#fb7185);color:white;}
+  .hdr-fil{background:linear-gradient(135deg,#d97706,#fbbf24);color:white;}
+  .hdr-mat{background:linear-gradient(135deg,#c2410c,#fb923c);color:white;}
+  .hdr-hist{background:linear-gradient(135deg,#0369a1,#38bdf8);color:white;}
+  .hdr-p-port{background:linear-gradient(135deg,#581c87,#9333ea);color:white;}
+  .hdr-p-geo{background:linear-gradient(135deg,#064e3b,#10b981);color:white;}
+  .hdr-p-cien{background:linear-gradient(135deg,#881337,#f43f5e);color:white;}
+  .hdr-p-mat{background:linear-gradient(135deg,#7c2d12,#f97316);color:white;}
+  .hdr-p-hist{background:linear-gradient(135deg,#082f49,#0ea5e9);color:white;}
+
+  #cel{display:none;position:fixed;inset:0;z-index:1000;background:rgba(126,34,206,.88);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px;}
+  #cel.show{display:flex;}
+  #cel h2{font-family:'Fredoka One',sans-serif;font-size:clamp(1.8rem,7vw,2.8rem);color:white;margin:16px 0 8px;}
+  #cel .cel-sub{font-size:clamp(.95rem,3.5vw,1.15rem);color:rgba(255,255,255,.9);font-weight:700;margin-top:4px;line-height:1.6;}
+  .cel-emojis{font-size:3.5rem;letter-spacing:4px;animation:bounce .6s ease-in-out infinite alternate;}
+  @keyframes bounce{from{transform:translateY(0) scale(1);}to{transform:translateY(-12px) scale(1.1);}}
+  .stars-row{font-size:1.6rem;letter-spacing:6px;margin:10px 0;animation:twinkle 1.5s ease-in-out infinite;}
+  .close-btn{margin-top:24px;background:white;color:#7e22ce;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;padding:14px 32px;border-radius:50px;cursor:pointer;min-width:220px;}
+
+  .final-task{background:linear-gradient(135deg,#7e22ce,#c084fc,#f472b6);border-radius:14px!important;padding:16px 14px!important;animation:pulse-border 2s ease-in-out infinite;position:relative;overflow:hidden;}
+  .final-task::before{content:'✨';position:absolute;font-size:4rem;opacity:.08;right:-10px;top:-10px;pointer-events:none;}
+  .final-task .cb{width:36px!important;height:36px!important;min-width:36px!important;border-radius:50%!important;border:none!important;background:rgba(255,255,255,.25)!important;font-size:1.1rem!important;color:white!important;}
+  .final-task .task-txt{color:white!important;font-size:1rem!important;font-weight:900!important;text-shadow:0 1px 4px rgba(0,0,0,.15);}
+  .final-task:hover{background:linear-gradient(135deg,#6b21a8,#a855f7,#ec4899)!important;}
+  .final-task.done .cb{background:white!important;color:#7e22ce!important;font-size:1.1rem!important;}
+  .final-task.done .task-txt{text-decoration:none!important;color:white!important;}
+  @keyframes pulse-border{0%,100%{box-shadow:0 0 0 0 rgba(192,132,252,.5);}50%{box-shadow:0 0 0 10px rgba(192,132,252,.0);}}
+
+  footer{text-align:center;margin-top:48px;font-size:.82rem;color:#a78bfa;font-weight:700;padding-bottom:env(safe-area-inset-bottom,16px);}
+</style>
+</head>
+<body>
+
+<div id="cel">
+  <div class="cel-emojis">🎉🎊🎉</div>
+  <div class="stars-row">⭐🌟✨🌟⭐</div>
+  <h2>VOCÊ É INCRÍVEL!</h2>
+  <p class="cel-sub">
+    Estudei <b>todos os dias</b> 📚<br>
+    Encarei <b>5 provas</b> de frente 💪<br>
+    E cheguei até o fim com tudo! 🏆<br><br>
+    Agora é hora de <b>descansar e comemorar</b> —<br>
+    eu mereço muito! 💜✨
+  </p>
+  <div class="stars-row" style="margin-top:16px">🦋🌈🦋🌈🦋</div>
+  <button class="close-btn" onclick="document.getElementById('cel').classList.remove('show')">Fechar e celebrar! 🎊</button>
+</div>
+
+<div class="hero">
+  <span class="hstar" style="top:14px;left:20px;font-size:1.4rem;animation-delay:0s">⭐</span>
+  <span class="hstar" style="top:30px;right:36px;font-size:1rem;animation-delay:.7s">✨</span>
+  <span class="hstar" style="bottom:20px;left:13%;font-size:1.1rem;animation-delay:1.2s">🌟</span>
+  <span class="hstar" style="bottom:16px;right:11%;font-size:.9rem;animation-delay:.4s">⭐</span>
+  <span class="hero-emoji">📚</span>
+  <h1>Minha Agenda de Estudos</h1>
+  <p>6º ano · Colégio Santa Cecília 💜</p>
+</div>
+
+<div class="prog-wrap">
+  <div class="progress-section">
+    <div class="prog-hdr">
+      <span class="prog-lbl">⭐ Meu progresso geral</span>
+      <span class="prog-cnt" id="pCount">0 / 0 tarefas</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" id="pBar" style="width:0%"></div></div>
+    <div class="prog-msg" id="pMsg">Vou conseguir! 💪</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="week-lbl">📅 Semana 1 — preparação (14 a 17/06)</div>
+  <div class="days-grid">
+
+    <div class="day-card" id="c-dom14">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-port">
+        <div class="day-wday">Domingo · hoje! 🌟</div>
+        <div class="day-title">Português 📝</div>
+        <span class="date-badge">14 de junho</span>
+      </div>
+      <div class="day-body">
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-port">
+          <div class="tg-name">📝 Gramática</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Adjetivo: identificação, conceito e flexão (Gram. p. 110, 112–122)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Pronome: identificação e classificação (Gram. p. 133–142 / PL p. 248–255)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever TDs de revisão AQ3 e AQ4</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Material do Google Classroom</span></div>
+        </div>
+        <div class="tip">💡 Adjetivo concorda com o substantivo em gênero e número. Os exemplos do livro ajudam muito a fixar!</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-seg15">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-livro">
+        <div class="day-wday">Segunda-feira</div>
+        <div class="day-title">Redação — Livro Paradidático 📖</div>
+        <div><span class="date-badge">15 de junho</span><span class="ac-tag">⚡ AC</span></div>
+      </div>
+      <div class="day-body">
+        <div class="escola-pill">☀️ Manhã — Escola</div>
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-livro">
+          <div class="tg-name">📖 Amonstragem — releitura</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Releitura geral — personagens principais e enredo completo</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Anotar os temas centrais do livro (medo, amizade, identidade…)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever trechos marcantes que podem ser cobrados</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Escrever um resumo rápido da história com suas próprias palavras</span></div>
+        </div>
+        <div class="tip">💡 A AC de Redação avalia o livro paradidático — não é produção textual livre. Vale focar bem nos trechos e personagens! 📚</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-ter16">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-port">
+        <div class="day-wday">Terça-feira</div>
+        <div class="day-title">Português — revisão final 🔁</div>
+        <span class="date-badge">16 de junho</span>
+      </div>
+      <div class="day-body">
+        <div class="escola-pill">☀️ Manhã — Escola</div>
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-port">
+          <div class="tg-name">📝 Revisão</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Artigo: identificação e classificação (Gram. p. 106 / PL p. 220–227)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Numeral: identificação e classificação (Gram. p. 126–129)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Praticar interpretação de texto com questões</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever material do Google Classroom</span></div>
+        </div>
+        <div class="tip">💡 Amanhã é prova! Hoje é só revisar com calma — você já domina esse conteúdo 🌟</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-qua17">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-geo">
+        <div class="day-wday">Quarta-feira</div>
+        <div class="day-title">Geografia + Inglês 🌍</div>
+        <span class="date-badge">17 de junho</span>
+      </div>
+      <div class="day-body">
+        <div class="escola-pill">☀️ Manhã — Escola</div>
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-geo">
+          <div class="tg-name">🌍 Geografia</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Unidade 4 – Recursos Minerais e Energéticos (foco total — cai na AG!)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Unidade 5 – Relevo e Solos — leitura completa</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever caderno e slides do Google Classroom</span></div>
+        </div>
+        <div class="tg th-ing" style="margin-top:8px">
+          <div class="tg-name">🇬🇧 Inglês — Unit 5: Water</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Vocabulário do ciclo da água (p. 78–80)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Present Progressive: is/are + verbo-ing (p. 82–83)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">There was / There were (p. 88)</span></div>
+        </div>
+        <div class="tip">💡 Present Progressive = is/are + verbo-ing. Ex: She <b>is studying</b>. Amanhã já é prova! 💪</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="week-lbl">📅 Semana 2 — provas! 🔴 (18 a 24/06)</div>
+  <div class="days-grid">
+
+    <div class="day-card" id="c-qui18">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-p-port">
+        <div class="day-wday">Quinta-feira · 18 de junho</div>
+        <div class="day-title">🔴 PROVA: Português e Redação</div>
+        <div><span class="prova-tag">8h às 10h30 · liberada depois</span><span class="ac-tag">⚡ AC</span></div>
+      </div>
+      <div class="day-body">
+        <div class="prova-block" style="background:#f3e8ff;color:#7e22ce;">
+          <span style="font-size:1.4rem">💜</span>
+          <span>Arrasando! Lembro bem do Amonstragem — li com atenção! 📖</span>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">tarde — próxima prova: geo e inglês!</div>
+        <div class="tg th-ing">
+          <div class="tg-name">🇬🇧 Inglês — leituras</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Unit 4: Graphic story (p. 74–75)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Ler "An ocean of plastic" + identifying examples</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Mystery story (p. 92–93) + Google Classroom</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-sex19">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-p-geo">
+        <div class="day-wday">Sexta-feira · 19 de junho</div>
+        <div class="day-title">🔴 PROVA: Geografia e Inglês</div>
+        <span class="prova-tag">8h às 10h30 · liberada depois</span>
+      </div>
+      <div class="day-body">
+        <div class="prova-block" style="background:#d1fae5;color:#065f46;">
+          <span style="font-size:1.4rem">🌍</span><span>Mais uma na conta! Fui que fui! 💚</span>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">tarde — ciências</div>
+        <div class="tg th-cien">
+          <div class="tg-name">🔬 Ciências — Unidade 5</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 1: A movimentação dos animais (p. 120–125)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 2: A coordenação dos animais (p. 130–133)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 3: A percepção do ambiente / sentidos (p. 137–145)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever o Álbum dos Sentidos (AQ3) 🌈</span></div>
+        </div>
+        <div class="tip">💡 Os sentidos dos animais costumam cair com exemplos — lembrar os animais que o livro usa para cada sentido! 👁️👂</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-sab20">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-cien">
+        <div class="day-wday">Sábado</div>
+        <div class="day-title">Ciências + Filosofia 🦉</div>
+        <span class="date-badge">20 de junho</span>
+      </div>
+      <div class="day-body">
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-cien">
+          <div class="tg-name">🔬 Ciências — revisão geral</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Unidade 1 – Cap. 3: Propriedades dos materiais (p. 34–38)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Unidade 4 – Cap. 1: Características gerais dos seres vivos (p. 90–95)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Rever caderno, slides e Google Classroom de Ciências</span></div>
+        </div>
+        <div class="tg th-fil" style="margin-top:8px">
+          <div class="tg-name">🦉 Filosofia — Unidade II</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 3: O conhecimento de si mesmo</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 5: Quando pensamos, somos capazes de compreender</span></div>
+        </div>
+        <div class="tip">💡 Filosofia: não precisa decorar — entender a ideia central de cada cap já resolve. Resuminho de 2 linhas com suas palavras! 🦉</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-dom21">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-fil">
+        <div class="day-wday">Domingo</div>
+        <div class="day-title">Filosofia + início de Matemática 🔢</div>
+        <span class="date-badge">21 de junho</span>
+      </div>
+      <div class="day-body">
+        <div class="sec-lbl">tarde de estudos</div>
+        <div class="tg th-fil">
+          <div class="tg-name">🦉 Filosofia — Unidade III</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 1: O que é o ser humano</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 2: O ser humano é uma máquina que pensa?</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 3: O ser humano, o pensamento e a linguagem</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 4: Seria o ser humano o centro de todas as coisas?</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 5: Linguagem, pensamento e cultura</span></div>
+        </div>
+        <div class="tg th-mat" style="margin-top:8px">
+          <div class="tg-name">🔢 Matemática — aquecimento</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 7: Potenciação e raiz quadrada — revisão e exercícios</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 8: Divisibilidade — regras e primeiros exercícios</span></div>
+        </div>
+        <div class="atip">🔥 Matemática começa hoje! Essa prova precisa de atenção especial — vamos dedicar bastante tempo nos próximos dias!</div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-seg22">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-p-cien">
+        <div class="day-wday">Segunda-feira · 22 de junho</div>
+        <div class="day-title">🔴 PROVA: Ciências e Filosofia</div>
+        <span class="prova-tag">8h às 10h30 · liberada depois</span>
+      </div>
+      <div class="day-body">
+        <div class="prova-block" style="background:#ffe4e6;color:#9f1239;">
+          <span style="font-size:1.4rem">🔬</span><span>Estudei muito! Confio em mim! 💪</span>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">tarde — foco em matemática! 🔢</div>
+        <div class="tg th-mat">
+          <div class="tg-name">🔢 Matemática — parte principal</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 9: Números primos e fatoração — conceito e prática</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 10: Múltiplos de um número e MMC — exercícios</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 11: Divisores e MDC — conceito e exercícios</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 12: Fração — revisão completa</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 17: Comprimento (Lab. de Matemática)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Fundamentos Matemáticos: aulas 5 a 7 do módulo da 2ª etapa</span></div>
+        </div>
+        <div class="atip">🎯 Faz pelo menos 5 exercícios de MMC e MDC — são os que mais aparecem na prova!</div>
+      </div>
+    </div>
+
+    <div class="day-card mat-special" id="c-ter23">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="mat-banner">🔢 VOCÊ TREINOU MUITO — HORA DE ARRASAR! 🔢</div>
+      <div class="day-hdr hdr-p-mat">
+        <div class="day-wday">Terça-feira · 23 de junho</div>
+        <div class="day-title">🔴 PROVA: Matemática</div>
+        <span class="prova-tag">8h às 10h30 · liberada depois</span>
+      </div>
+      <div class="day-body">
+        <div class="prova-block" style="background:#ffedd5;color:#9a3412;">
+          <span style="font-size:1.4rem">🏆</span><span>Dediquei muito tempo a essa prova. Vou arrasar! 🔥</span>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">tarde — últimas provas!</div>
+        <div class="tg th-hist">
+          <div class="tg-name">🏛️ História</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 2: Fontes e o conhecimento em História (p. 28–32)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 7: Povos Indígenas da América (p. 132–147)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Cap. 8: O mundo grego e a democracia (p. 158–178)</span></div>
+        </div>
+        <div class="tg th-ling" style="margin-top:8px">
+          <div class="tg-name">📖 Sala de Linguagens</div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Reler trechos de "Cuidado: Garoto Apaixonado" (Toni Brandão)</span></div>
+          <div class="task" onclick="tog(this)"><div class="cb">✓</div><span class="task-txt">Personagens, enredo e temas principais do livro</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" id="c-qua24">
+      <div class="complete-badge">🌟 Dia completo!</div>
+      <div class="day-hdr hdr-p-hist">
+        <div class="day-wday">Quarta-feira · 24 de junho</div>
+        <div class="day-title">🔴 ÚLTIMA PROVA: História e Sala de Linguagens</div>
+        <span class="prova-tag">8h às 10h30</span>
+      </div>
+      <div class="day-body">
+        <div class="prova-block" style="background:#e0f2fe;color:#0c4a6e;">
+          <span style="font-size:1.4rem">🏛️</span><span>Última prova! Cheguei até aqui incrível! 🎉</span>
+        </div>
+        <div class="tg th-hist" style="margin-top:12px">
+          <div class="task final-task" onclick="togFinal(this)"><div class="cb">🏆</div><span class="task-txt">🎉 Terminei todas as provas! Toca aqui pra comemorar!</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer><p>Feito com 💜 · 6º ano EF · Colégio Santa Cecília Fortaleza</p></footer>
+
+<script>
+  const SAVE_KEY = 'agenda_estudos_v1';
+
+  function saveState(){
+    const tasks = document.querySelectorAll('.task');
+    const state = {};
+    tasks.forEach((t, i) => { state[i] = t.classList.contains('done'); });
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e){}
+  }
+
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if(!raw) return;
+      const state = JSON.parse(raw);
+      const tasks = document.querySelectorAll('.task');
+      tasks.forEach((t, i) => {
+        if(state[i]){
+          t.classList.add('done');
+          if(t.classList.contains('final-task')){
+            t.querySelector('.cb').textContent='🏆';
+            t.querySelector('.task-txt').textContent='🎉 PARABÉNS! Terminei tudo!';
+          }
+        }
+      });
+      document.querySelectorAll('.day-card').forEach(c => updDay(c));
+      updProg();
+    } catch(e){}
+  }
+
+  function togFinal(el){
+    el.classList.toggle('done');
+    if(el.classList.contains('done')){
+      el.querySelector('.cb').textContent='🏆';
+      el.querySelector('.task-txt').textContent='🎉 PARABÉNS! Terminei tudo!';
+      updDay(el.closest('.day-card'));
+      updProg();
+      saveState();
+      setTimeout(()=>document.getElementById('cel').classList.add('show'), 400);
+    } else {
+      el.querySelector('.cb').textContent='🏆';
+      el.querySelector('.task-txt').textContent='🎉 Terminei todas as provas! Toca aqui pra comemorar!';
+      updDay(el.closest('.day-card'));
+      updProg();
+      saveState();
+    }
+  }
+
+  function tog(el){
+    el.classList.toggle('done');
+    updProg();
+    updDay(el.closest('.day-card'));
+    saveState();
+  }
+
+  function updProg(){
+    const all=document.querySelectorAll('.task'), done=document.querySelectorAll('.task.done');
+    const total=all.length, count=done.length, pct=total?Math.round(count/total*100):0;
+    document.getElementById('pCount').textContent=count+' / '+total+' tarefas';
+    document.getElementById('pBar').style.width=pct+'%';
+    const msgs=[
+      [0,'Vou conseguir! 💪'],
+      [10,'Boa! Já comecei, vou continuar assim 🌱'],
+      [25,'Que isso! Tô voando 🔥'],
+      [50,'Metade do caminho! Sou incrível ⭐'],
+      [75,'Quase lá! Tô chegando! 🎉'],
+      [90,'UAU! Falta pouquinho! 🌟'],
+      [100,'PERFEITA! Arrasoooei! 🏆✨🎊']
+    ];
+    let msg=msgs[0][1];
+    for(const[t,m] of msgs){if(pct>=t)msg=m;}
+    document.getElementById('pMsg').textContent=msg;
+  }
+
+  function updDay(card){
+    if(!card)return;
+    const tasks=card.querySelectorAll('.task'), done=card.querySelectorAll('.task.done');
+    if(tasks.length>0&&tasks.length===done.length) card.classList.add('completed');
+    else card.classList.remove('completed');
+  }
+
+  loadState();
+</script>
+</body>
+</html>
